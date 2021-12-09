@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   TextInput,
   Image,
@@ -17,24 +17,28 @@ import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import { AppHeaderIcon } from "../components/AppHeaderIcon";
 import { THEME } from "../theme";
 import { addPost } from "../store/actions/post";
+import { PhotoPicker } from "../components/PhotoPicker";
 
 export const CreateScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [text, setText] = useState("");
-
-  const img =
-    "https://cdn.londonandpartners.com/visit/general-london/areas/river/76709-640x360-houses-of-parliament-and-london-eye-on-thames-from-above-640.jpg";
+  const imgRef = useRef();
 
   const saveHandler = () => {
     const post = {
       date: new Date().toJSON(),
       text: text,
-      img: img,
+      img: imgRef.current,
       booked: false,
     };
     dispatch(addPost(post));
     navigation.navigate("Main");
   };
+
+  const photoPickHandler = (uri) => {
+    imgRef.current = uri;
+  };
+
   return (
     <ScrollView>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -48,16 +52,12 @@ export const CreateScreen = ({ navigation }) => {
             multiline
           />
 
-          <Image
-            style={{ width: "100%", height: 200, marginBottom: 10 }}
-            source={{
-              uri: img,
-            }}
-          />
+          <PhotoPicker onPick={photoPickHandler} />
           <Button
             title="Создать пост"
             color={THEME.MAIN_COLOR}
             onPress={saveHandler}
+            disabled={!text}
           />
         </View>
       </TouchableWithoutFeedback>
