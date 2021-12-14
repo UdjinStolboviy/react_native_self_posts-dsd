@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
+import { View, StyleSheet, ActivityIndicator } from "react-native";
 //import { DATA } from "../data";
 import { useDispatch, useSelector } from "react-redux";
 import { AppHeaderIcon } from "../components/AppHeaderIcon";
 import { PostList } from "../components/PostList";
+import { THEME } from "../theme";
 
 import { loadPosts } from "../store/actions/post";
 
@@ -15,15 +17,24 @@ export const MainScreen = ({ navigation }) => {
       booked: post.booked,
     });
   };
-  
+
   const dispatch = useDispatch();
-  
-  useEffect(() => { 
-      dispatch(loadPosts())
+
+  useEffect(() => {
+    dispatch(loadPosts());
   }, [dispatch]);
 
   const allPosts = useSelector((state) => state.post.allPosts);
-  
+  const loading = useSelector((state) => state.post.loading);
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator color={THEME.MAIN_COLOR} />
+      </View>
+    );
+  }
+
   return <PostList data={allPosts} onOpen={openPostHandler} />;
 };
 
@@ -47,4 +58,12 @@ MainScreen.navigationOptions = ({ navigation }) => ({
       />
     </HeaderButtons>
   ),
+});
+
+const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
